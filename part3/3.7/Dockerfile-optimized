@@ -1,0 +1,21 @@
+FROM node:12-alpine
+
+EXPOSE 3000
+
+WORKDIR /usr/src/app
+
+RUN apk add --no-cache curl git && \
+    git clone https://github.com/hzville/DevOps-with-Docker-2021-mock-repo.git && \
+    mkdir web-app && \
+    cp -r DevOps-with-Docker-2021-mock-repo/web-app/index.html web-app/ && \
+    rm -rf DevOps-with-Docker-2021-mock-repo && \
+    npm install -g serve && \
+    apk del curl git && \
+    adduser -D appuser
+
+USER appuser
+
+
+WORKDIR ./web-app
+
+CMD serve

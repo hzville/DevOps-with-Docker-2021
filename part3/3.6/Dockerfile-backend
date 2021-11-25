@@ -1,0 +1,24 @@
+FROM golang:alpine AS server-side
+
+EXPOSE 8080
+
+RUN apk add --no-cache git && \
+    git clone https://github.com/docker-hy/material-applications.git && \
+    cp -r material-applications/example-backend . && \
+    rm -rf material-application
+
+WORKDIR ./example-backend
+
+RUN CGO_ENABLED=0 go build
+
+FROM scratch
+
+EXPOSE 8080
+
+ENV REQUEST_ORIGIN=http://localhost:5000
+
+COPY --from=server-side /go/example-backend/ /usr/bin
+
+WORKDIR /usr/bin
+
+ENTRYPOINT ["./server"]

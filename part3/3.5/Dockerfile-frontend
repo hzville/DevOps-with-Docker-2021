@@ -1,0 +1,24 @@
+FROM node:12-alpine
+
+EXPOSE 5000
+
+WORKDIR /usr/src/app
+
+RUN apk add --no-cache curl git && \
+    git clone https://github.com/docker-hy/material-applications.git && \
+    cp -r material-applications/example-frontend . && \
+    rm -rf material-application
+
+WORKDIR ./example-frontend
+
+ENV REACT_APP_BACKEND_URL=http://localhost:8080
+
+RUN npm install && \
+    npm run build && \
+    npm install -g serve && \
+    apk del curl git && \
+    adduser -D appuser
+
+USER appuser
+
+CMD serve -s -l 5000 build
